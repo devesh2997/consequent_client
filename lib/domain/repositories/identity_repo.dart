@@ -1,5 +1,7 @@
+import 'package:consequent_client/domain/entities/token.dart';
+
 abstract class IdentityRepo {
-  Future<void> isLoggedIn();
   Future<void> sendOTP(int mobileNumber);
-  Future<bool> verifyOTP(int mobileNumber, int otp);
+  Future<Token> verifyOTP(int mobileNumber, int otp);
+  Future<Token> signInWithEmail(String email, String password);
 }
