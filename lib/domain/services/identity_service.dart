@@ -2,7 +2,7 @@ import 'package:consequent_client/domain/entities/token.dart';
 import 'package:consequent_client/domain/repositories/identity_repo.dart';
 import 'package:consequent_client/domain/repositories/token_repo.dart';
 
-abstract class IdentiyService {
+abstract class IdentityService {
   Future<bool> isLoggedIn();
   Future<void> sendOTP(int mobileNumber);
   Future<Token> verifyOTP(int mobileNumber, int otp);
@@ -10,7 +10,7 @@ abstract class IdentiyService {
   Future<void> logout();
 }
 
-class IdentityServiceImpl implements IdentiyService {
+class IdentityServiceImpl implements IdentityService {
   final IdentityRepo repo;
   final TokenRepo tokenRepo;
 

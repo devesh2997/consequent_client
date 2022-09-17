@@ -3,12 +3,6 @@ import 'package:consequent_client/domain/repositories/identity_repo.dart';
 
 class IdentityRepoImpl implements IdentityRepo {
   @override
-  Future<void> isLoggedIn() {
-    // TODO: implement isLoggedIn
-    throw UnimplementedError();
-  }
-
-  @override
   Future<void> sendOTP(int mobileNumber) {
     // TODO: implement sendOTP
     throw UnimplementedError();

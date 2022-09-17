@@ -1,5 +1,5 @@
 import 'package:consequent_client/domain/entities/token.dart';
-import 'package:consequent_client/domain/repositories/jwt_repo.dart';
+import 'package:consequent_client/domain/repositories/token_repo.dart';
 
 class TokenStore {
   final TokenRepo repo;
