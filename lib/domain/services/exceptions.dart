@@ -5,6 +5,13 @@ class InvalidMobileException implements Exception {
   }
 }
 
+class InvalidOTPException implements Exception {
+  @override
+  String toString() {
+    return "Invalid OTP";
+  }
+}
+
 class InvalidEmailException implements Exception {
   @override
   String toString() {

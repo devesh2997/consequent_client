@@ -36,21 +36,21 @@ class IdentityServiceImpl implements IdentityService {
 
   @override
   Future<String> sendOTP(int mobileNumber) {
-    if (!_validateMobileNumber(mobileNumber)) {
+    if (!_isMobileNumberValid(mobileNumber)) {
       throw InvalidMobileException();
     }
 
     return repo.sendOTP(mobileNumber);
   }
 
-  bool _validateMobileNumber(int mobileNumber) {
-    return mobileNumber.toString().length !=
+  bool _isMobileNumberValid(int mobileNumber) {
+    return mobileNumber.toString().length ==
         10; // TODO (devesh2997) | improve this validation. (can use regex)
   }
 
   @override
   Future<void> signInWithEmail(String email, String password) async {
-    if (!_validateEmail(email)) {
+    if (!_isEmailValid(email)) {
       throw InvalidEmailException();
     }
 
@@ -63,13 +63,20 @@ class IdentityServiceImpl implements IdentityService {
   @override
   Future<void> verifyOTP(
       String verificationID, int mobileNumber, int otp) async {
+    if (!_isOTPValid(otp)) {
+      throw InvalidOTPException();
+    }
     var token = await repo.verifyOTP(verificationID, mobileNumber, otp);
     await tokenStore.storeToken(token);
 
     notifyLoggedIn();
   }
 
-  bool _validateEmail(String email) {
+  bool _isOTPValid(int otp) {
+    return otp.toString().length == 4;
+  }
+
+  bool _isEmailValid(String email) {
     return RegExp(
             r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
         .hasMatch(email);
@@ -95,7 +102,7 @@ class IdentityServiceImpl implements IdentityService {
 
   void notifyLoggedOut() {
     for (var callback in _callbacks) {
-      callback(true);
+      callback(false);
     }
   }
 }

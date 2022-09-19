@@ -1,15 +1,17 @@
+import 'package:consequent_client/presentation/controllers/identity_controller.dart';
+import 'package:consequent_client/presentation/pages/home.dart';
 import 'package:consequent_client/presentation/pages/login.dart';
 import 'package:consequent_client/presentation/pages/splash.dart';
+import 'package:consequent_client/presentation/widgets/hocs/with_login.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:get/get.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  Get.put(IdentityController());
   runApp(const MyApp());
 }
 
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
         dividerColor: Colors.white54,
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
             .copyWith(
-                secondary: Colors.indigo.shade100,
+                secondary: Colors.indigo.shade600,
                 brightness: Brightness.light),
         highlightColor: Colors.blue,
       ),
@@ -40,11 +42,13 @@ class MyApp extends StatelessWidget {
         dividerColor: Colors.black12,
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
             .copyWith(
-                secondary: Colors.indigo.shade900, brightness: Brightness.dark),
+                secondary: Colors.indigo.shade400, brightness: Brightness.dark),
         highlightColor: Colors.pink,
       ),
-      themeMode: ThemeMode.light,
-      home: const Login(),
+      themeMode: ThemeMode.dark,
+      home: WithLogin(
+        const Home(),
+      ),
     );
   }
 }
