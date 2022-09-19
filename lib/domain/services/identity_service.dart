@@ -1,25 +1,29 @@
-import 'package:consequent_client/domain/entities/token.dart';
 import 'package:consequent_client/domain/repositories/identity_repo.dart';
-import 'package:consequent_client/domain/repositories/token_repo.dart';
+import 'package:consequent_client/domain/services/exceptions.dart';
+import 'package:consequent_client/domain/services/token_store.dart';
+
+typedef LoginStateChangeCallback = void Function(bool isLoggedIn);
 
 abstract class IdentityService {
   Future<bool> isLoggedIn();
-  Future<void> sendOTP(int mobileNumber);
-  Future<Token> verifyOTP(int mobileNumber, int otp);
-  Future<Token> signInWithEmail(String email, String password);
+  Future<String> sendOTP(int mobileNumber);
+  Future<void> verifyOTP(String verificationID, int mobileNumber, int otp);
+  Future<void> signInWithEmail(String email, String password);
   Future<void> logout();
+  void onLoginStateChanged(LoginStateChangeCallback callback);
 }
 
 class IdentityServiceImpl implements IdentityService {
   final IdentityRepo repo;
-  final TokenRepo tokenRepo;
+  final TokenStore tokenStore;
+  final List<LoginStateChangeCallback> _callbacks = [];
 
-  IdentityServiceImpl(this.repo, this.tokenRepo);
+  IdentityServiceImpl({required this.repo, required this.tokenStore});
 
   @override
   Future<bool> isLoggedIn() async {
     try {
-      String? refreshToken = await tokenRepo.getRefreshToken();
+      String? refreshToken = await tokenStore.getRefreshToken();
       if (refreshToken == null) {
         return false;
       }
@@ -31,24 +35,67 @@ class IdentityServiceImpl implements IdentityService {
   }
 
   @override
-  Future<void> sendOTP(int mobileNumber) {
-    // TODO: (devesh2997) | validate mobile number
+  Future<String> sendOTP(int mobileNumber) {
+    if (!_validateMobileNumber(mobileNumber)) {
+      throw InvalidMobileException();
+    }
+
     return repo.sendOTP(mobileNumber);
   }
 
-  @override
-  Future<Token> signInWithEmail(String email, String password) {
-    // TODO: (devesh2997) | validate email and password here
-    return repo.signInWithEmail(email, password);
+  bool _validateMobileNumber(int mobileNumber) {
+    return mobileNumber.toString().length !=
+        10; // TODO (devesh2997) | improve this validation. (can use regex)
   }
 
   @override
-  Future<Token> verifyOTP(int mobileNumber, int otp) {
-    return repo.verifyOTP(mobileNumber, otp);
+  Future<void> signInWithEmail(String email, String password) async {
+    if (!_validateEmail(email)) {
+      throw InvalidEmailException();
+    }
+
+    var token = await repo.signInWithEmail(email, password);
+    await tokenStore.storeToken(token);
+
+    notifyLoggedIn();
   }
 
   @override
-  Future<void> logout() {
-    return tokenRepo.deleteToken();
+  Future<void> verifyOTP(
+      String verificationID, int mobileNumber, int otp) async {
+    var token = await repo.verifyOTP(verificationID, mobileNumber, otp);
+    await tokenStore.storeToken(token);
+
+    notifyLoggedIn();
+  }
+
+  bool _validateEmail(String email) {
+    return RegExp(
+            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+        .hasMatch(email);
+  }
+
+  @override
+  Future<void> logout() async {
+    await tokenStore.deleteToken();
+
+    notifyLoggedOut();
+  }
+
+  @override
+  void onLoginStateChanged(LoginStateChangeCallback callback) {
+    _callbacks.add(callback);
+  }
+
+  void notifyLoggedIn() {
+    for (var callback in _callbacks) {
+      callback(true);
+    }
+  }
+
+  void notifyLoggedOut() {
+    for (var callback in _callbacks) {
+      callback(true);
+    }
   }
 }

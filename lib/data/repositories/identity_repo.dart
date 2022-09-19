@@ -3,20 +3,23 @@ import 'package:consequent_client/domain/repositories/identity_repo.dart';
 
 class IdentityRepoImpl implements IdentityRepo {
   @override
-  Future<void> sendOTP(int mobileNumber) {
+  Future<String> sendOTP(int mobileNumber) {
     // TODO: implement sendOTP
-    throw UnimplementedError();
+    return Future.delayed(const Duration(milliseconds: 100))
+        .then((onValue) => "abc");
   }
 
   @override
   Future<Token> signInWithEmail(String email, String password) {
     // TODO: implement signInWithEmail
-    throw UnimplementedError();
+    return Future.delayed(const Duration(milliseconds: 100))
+        .then((onValue) => Token("test", "test"));
   }
 
   @override
-  Future<Token> verifyOTP(int mobileNumber, int otp) {
+  Future<Token> verifyOTP(String verificationID, int mobileNumber, int otp) {
     // TODO: implement verifyOTP
-    throw UnimplementedError();
+    return Future.delayed(const Duration(milliseconds: 100))
+        .then((onValue) => Token("test", "test"));
   }
 }

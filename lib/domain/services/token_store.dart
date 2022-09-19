@@ -17,4 +17,8 @@ class TokenStore {
   Future<String?> getRefreshToken() {
     return repo.getRefreshToken();
   }
+
+  Future<void> deleteToken() {
+    return repo.deleteToken();
+  }
 }
