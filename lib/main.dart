@@ -1,17 +1,17 @@
 import 'package:consequent_client/presentation/controllers/identity_controller.dart';
+import 'package:consequent_client/presentation/controllers/theme_controller.dart';
 import 'package:consequent_client/presentation/pages/home.dart';
-import 'package:consequent_client/presentation/pages/login.dart';
 import 'package:consequent_client/presentation/pages/splash.dart';
 import 'package:consequent_client/presentation/widgets/hocs/with_login.dart';
+import 'package:consequent_client/presentation/widgets/hocs/with_theme.dart';
 import 'package:flutter/material.dart';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'package:get/get.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Get.put(IdentityController());
+  Get.put(ThemeController());
   runApp(const MyApp());
 }
 
@@ -46,9 +46,9 @@ class MyApp extends StatelessWidget {
         highlightColor: Colors.pink,
       ),
       themeMode: ThemeMode.dark,
-      home: WithLogin(
+      home: WithTheme(WithLogin(
         const Home(),
-      ),
+      )),
     );
   }
 }

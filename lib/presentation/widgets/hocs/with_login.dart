@@ -1,4 +1,5 @@
 import 'package:consequent_client/presentation/controllers/identity_controller.dart';
+import 'package:consequent_client/presentation/widgets/appbars/default_app_bar.dart';
 import 'package:consequent_client/presentation/widgets/texts/heading_1.dart';
 import 'package:consequent_client/presentation/widgets/texts/subtitle.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class LoginWithMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
+        appBar: defaultAppBar(),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: _controller.hasOTPBeenSent()
               ? _controller.verifyOTP
@@ -44,7 +46,7 @@ class LoginWithMobile extends StatelessWidget {
                 ),
         ),
         body: Padding(
-          padding: const EdgeInsets.fromLTRB(28, 50, 28, 50),
+          padding: const EdgeInsets.fromLTRB(28, 28, 28, 50),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
