@@ -1,3 +1,4 @@
+import 'package:consequent_client/domain/entities/token.dart';
 import 'package:consequent_client/domain/repositories/identity_repo.dart';
 import 'package:consequent_client/domain/services/exceptions.dart';
 import 'package:consequent_client/domain/services/token_store.dart';
@@ -23,8 +24,8 @@ class IdentityServiceImpl implements IdentityService {
   @override
   Future<bool> isLoggedIn() async {
     try {
-      String? refreshToken = await tokenStore.getRefreshToken();
-      if (refreshToken == null) {
+      Token? token = await tokenStore.getToken();
+      if (token == null || token.refreshToken.token.isEmpty) {
         return false;
       }
 

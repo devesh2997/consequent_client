@@ -1,6 +1,18 @@
-class Token {
-  final String jet;
-  final String refreshToken;
+class JWTToken {
+  final String token;
 
-  Token(this.jet, this.refreshToken);
+  JWTToken(this.token);
+}
+
+class RefreshToken {
+  final String token;
+
+  RefreshToken(this.token);
+}
+
+class Token {
+  final JWTToken jwt;
+  final RefreshToken refreshToken;
+
+  Token(this.jwt, this.refreshToken);
 }

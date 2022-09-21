@@ -1,32 +1,40 @@
+import 'dart:convert';
+
+import 'package:consequent_client/data/dtos/token.dart';
+import 'package:consequent_client/data/mappers/token.dart';
+import 'package:consequent_client/datasources/secure_local_storage.dart';
 import 'package:consequent_client/domain/entities/token.dart';
 import 'package:consequent_client/domain/repositories/token_repo.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const jwtKey = "jwt";
-const refreshTokenKey = "refresh_token";
+const tokenKey = "token";
 
 class TokenRepoImpl implements TokenRepo {
-  final storage = const FlutterSecureStorage();
-  @override
-  Future<String?> getJWT() {
-    return storage.read(key: jwtKey);
-  }
+  final SecureLocalStorage storage;
+
+  TokenRepoImpl(this.storage);
 
   @override
-  Future<void> storeToken(Token jwt) {
-    return storage.write(key: jwtKey, value: jwt.jet).then((value) =>
-        storage.write(key: refreshTokenKey, value: jwt.refreshToken));
-  }
+  Future<void> storeToken(Token token) {
+    var tokenDTO = TokenMapper().toModel(token);
 
-  @override
-  Future<String?> getRefreshToken() {
-    return storage.read(key: refreshTokenKey);
+    String tokenStr = jsonEncode(tokenDTO.toJson());
+    return storage.set(key: tokenKey, value: tokenStr);
   }
 
   @override
   Future<void> deleteToken() {
-    return storage
-        .delete(key: refreshTokenKey)
-        .then((value) => storage.delete(key: jwtKey));
+    return storage.delete(key: tokenKey);
+  }
+
+  @override
+  Future<Token?> getToken() async {
+    String? tokenStr = await storage.get(key: tokenKey);
+    if (tokenStr == null) {
+      return null;
+    }
+    TokenDTO tokenDTO = TokenDTO.fromJson(jsonDecode(tokenStr));
+
+    return TokenMapper().toEntity(tokenDTO);
   }
 }
