@@ -4,6 +4,7 @@ import 'package:consequent_client/presentation/widgets/texts/heading_1.dart';
 import 'package:consequent_client/presentation/widgets/texts/subtitle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otp_autofill/otp_autofill.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
@@ -19,59 +20,130 @@ class WithLogin extends StatelessWidget {
   }
 }
 
-class LoginWithMobile extends StatelessWidget {
-  final IdentityController _controller = Get.find<IdentityController>();
+class LoginWithMobile extends StatefulWidget {
   LoginWithMobile({Key? key}) : super(key: key);
+
+  @override
+  State<LoginWithMobile> createState() => _LoginWithMobileState();
+}
+
+class _LoginWithMobileState extends State<LoginWithMobile> {
+  final IdentityController _controller = Get.find<IdentityController>();
+  final OtpFieldController _otpController = OtpFieldController();
+
+  _LoginWithMobileState() {
+    _controller.onOTPChanged((otp) {
+      var otpStr = otp.toString();
+      var i = 0;
+      otpStr.runes.forEach((rune) {
+        var character = String.fromCharCode(rune);
+        _otpController.setValue(character, i);
+        i++;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => Scaffold(
-        appBar: defaultAppBar(),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: _controller.hasOTPBeenSent()
-              ? _controller.verifyOTP
-              : _controller.sendOTP,
-          label: Text(
-            _controller.hasOTPBeenSent() ? "Verify OTP" : "Next",
-          ),
-          icon: _controller.isLoading()
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(),
-                )
-              : const Icon(
-                  Icons.arrow_forward_sharp,
-                ),
+      () => _controller.hasOTPBeenSent()
+          ? getOTPForm(context)
+          : getMobileForm(context),
+    );
+  }
+
+  Scaffold getMobileForm(BuildContext context) {
+    return Scaffold(
+      appBar: defaultAppBar(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _controller.sendOTP,
+        label: const Text(
+          "Next",
         ),
-        body: Padding(
-          padding: const EdgeInsets.fromLTRB(28, 28, 28, 50),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              getHeading(),
-              getSubtitle(),
-              getInput(context),
-            ],
-          ),
+        icon: _controller.isLoading()
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(),
+              )
+            : const Icon(
+                Icons.arrow_forward_sharp,
+              ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(28, 28, 28, 50),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Heading1("Enter your mobile number"),
+            const SizedBox(
+              height: 24,
+            ),
+            const Subtitle("We will send you a confirmation code"),
+            const SizedBox(
+              height: 24,
+            ),
+            getMobileInput(),
+          ],
         ),
       ),
     );
   }
 
-  Widget getInput(BuildContext context) {
-    if (_controller.hasOTPBeenSent()) {
-      return getOTPInput(context);
-    }
-    return getMobileInput();
+  Scaffold getOTPForm(BuildContext context) {
+    return Scaffold(
+      appBar: defaultAppBar(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _controller.verifyOTP,
+        label: const Text(
+          "Verify OTP",
+        ),
+        icon: _controller.isLoading()
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(),
+              )
+            : const Icon(
+                Icons.arrow_forward_sharp,
+              ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(28, 28, 28, 50),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Heading1("Enter OTP sent to your number"),
+            getOTPInput(context),
+            Subtitle(
+              "We have sent an OTP to ${_controller.getEnteredMobileNumber()}.",
+            ),
+            const SizedBox(
+              height: 6,
+            ),
+            GestureDetector(
+              onTap: _controller.changeMobileNumber,
+              child: const Subtitle(
+                "Not your number ? Change.",
+                decoration: TextDecoration.underline,
+                textColor: Colors.blue,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget getOTPInput(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SizedBox(
+          height: 24,
+        ),
         OTPTextField(
+          controller: _otpController,
           otpFieldStyle: OtpFieldStyle(
             borderColor: Theme.of(context).highlightColor,
             focusBorderColor: Theme.of(context).highlightColor,
@@ -82,7 +154,7 @@ class LoginWithMobile extends StatelessWidget {
           hasError: _controller.invalidOTPError().isNotEmpty,
           width: MediaQuery.of(context).size.width,
           length: 4,
-          onChanged: _controller.onOTPChanged,
+          onChanged: _controller.setOTP,
           fieldStyle: FieldStyle.box,
           fieldWidth: 40,
           style: const TextStyle(
@@ -108,7 +180,7 @@ class LoginWithMobile extends StatelessWidget {
     return Expanded(
       child: TextField(
         keyboardType: TextInputType.number,
-        onChanged: _controller.onMobileChanged,
+        onChanged: _controller.setMobile,
         style: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 24,
@@ -126,28 +198,6 @@ class LoginWithMobile extends StatelessWidget {
           errorText: _controller.invalidMobileError(),
         ),
       ),
-    );
-  }
-
-  Padding getSubtitle() {
-    String text = _controller.hasOTPBeenSent()
-        ? "We have sent an OTP to ${_controller.getEnteredMobileNumber()}"
-        : "We will send you a confirmation code";
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
-      child: Subtitle(
-        text,
-      ),
-    );
-  }
-
-  Heading1 getHeading() {
-    String text = _controller.hasOTPBeenSent()
-        ? "Enter OTP sent to your number"
-        : "Enter your mobile number";
-    return Heading1(
-      text,
     );
   }
 }

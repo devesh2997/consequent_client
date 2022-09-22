@@ -2,6 +2,19 @@ import 'package:consequent_client/containers/identity_container.dart';
 import 'package:consequent_client/domain/services/exceptions.dart';
 import 'package:consequent_client/domain/services/identity_service.dart';
 import 'package:get/get.dart';
+import 'package:otp_autofill/otp_autofill.dart';
+
+typedef OTPChangeCallback = void Function(int otp);
+
+class SampleStrategy extends OTPStrategy {
+  @override
+  Future<String> listenForCode() {
+    return Future.delayed(
+      const Duration(seconds: 10),
+      () => 'Your code is 54321',
+    );
+  }
+}
 
 class IdentityController extends GetxController {
   final IdentityService identityService = injectIdentityService();
@@ -20,6 +33,10 @@ class IdentityController extends GetxController {
   final Rx<String> _invalidMobileError = "".obs;
   final Rx<String> _invalidOTPError = "".obs;
 
+  late OTPTextEditController controller;
+
+  OTPChangeCallback? _otpChangeCallback;
+
   @override
   void onInit() async {
     try {
@@ -32,21 +49,33 @@ class IdentityController extends GetxController {
           _reset();
         }
       });
+      _startListeningForOTP();
     } catch (e) {}
     super.onInit();
   }
 
-  void onMobileChanged(String mobileNumber) {
-    _invalidMobileError.value = "";
+  void onOTPChanged(OTPChangeCallback callback) {
+    _otpChangeCallback = callback;
+  }
+
+  void setMobile(String mobileNumber) {
+    _resetErrors();
     _mobileNumber.value = int.tryParse(mobileNumber) ?? 0;
   }
 
-  void onOTPChanged(String otp) {
+  void setOTP(String otp) {
     _invalidOTPError.value = "";
     _otp = int.tryParse(otp) ?? 0;
     if (otp.length == 4) {
       verifyOTP();
     }
+  }
+
+  void changeMobileNumber() {
+    _resetErrors();
+    _resetOTPInputs();
+    _resetLoaders();
+    _resetStates();
   }
 
   void _reset() {
@@ -68,13 +97,34 @@ class IdentityController extends GetxController {
   }
 
   void _resetInputs() {
-    _verificationID = "";
+    _resetOTPInputs();
     _mobileNumber.value = 0;
+  }
+
+  void _resetOTPInputs() {
+    _verificationID = "";
     _otp = 0;
   }
 
   void _resetStates() {
     _otpSent.value = false;
+  }
+
+  void _startListeningForOTP() {
+    controller = OTPTextEditController(
+      codeLength: 4,
+      onCodeReceive: (code) {
+        _otpChangeCallback!(int.tryParse(code) ?? 0);
+      },
+    )..startListenUserConsent(
+        (code) {
+          final exp = RegExp(r'(\d{4})');
+          return exp.stringMatch(code ?? '') ?? '';
+        },
+        strategies: [
+          // SampleStrategy(),
+        ],
+      );
   }
 
   void sendOTP() async {

@@ -11,7 +11,7 @@ import 'package:consequent_client/domain/services/exceptions.dart';
 import 'package:http/http.dart' as http;
 
 class IdentityAPIConstants {
-  static String baseURL = "eighty-toys-love-47-31-251-136.loca.lt";
+  static String baseURL = "two-buses-reply-47-31-241-199.loca.lt";
 
   static String sendOTPEndpoint = "identity/v1/send-otp";
   static String verifyOTPEndpoint = "identity/v1/verify-otp";
