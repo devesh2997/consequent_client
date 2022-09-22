@@ -87,7 +87,7 @@ class IdentityController extends GetxController {
     } on InvalidMobileException catch (e) {
       _invalidMobileError.value = e.toString();
     } catch (e) {
-      _error.value = e.toString();
+      _invalidMobileError.value = e.toString();
     }
 
     _isSendingOTP.value = false;
@@ -102,7 +102,7 @@ class IdentityController extends GetxController {
     } on InvalidOTPException catch (e) {
       _invalidOTPError.value = e.toString();
     } catch (e) {
-      _error.value = e.toString();
+      _invalidOTPError.value = e.toString();
     }
 
     _isVerifyingOTP.value = false;

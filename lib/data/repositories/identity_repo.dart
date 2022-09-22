@@ -11,7 +11,7 @@ import 'package:consequent_client/domain/services/exceptions.dart';
 import 'package:http/http.dart' as http;
 
 class IdentityAPIConstants {
-  static String baseURL = "some-parks-share-122-161-84-118.loca.lt";
+  static String baseURL = "eighty-toys-love-47-31-251-136.loca.lt";
 
   static String sendOTPEndpoint = "identity/v1/send-otp";
   static String verifyOTPEndpoint = "identity/v1/verify-otp";
@@ -27,10 +27,18 @@ class IdentityRepoImpl implements IdentityRepo {
           {"mobile_number": mobileNumber.toString()});
       var response = await http.post(url, body: {});
 
+      if (response.statusCode != 200) {
+        throw APIException(response.reasonPhrase);
+      }
+
       APIResponse<VerificationID> res = APIResponse.fromJson(
           jsonDecode(response.body), VerificationID.fromJson);
 
-      return res.data?.verificationID ?? "";
+      if (res.isSuccess()) {
+        return res.data?.verificationID ?? "";
+      }
+
+      throw APIException(res.error());
     } catch (e) {
       log(e.toString()); // TODO (devesh2997) | handle exception
       rethrow;
@@ -63,6 +71,10 @@ class IdentityRepoImpl implements IdentityRepo {
 
       APIResponse<TokenDTO> res =
           APIResponse.fromJson(jsonDecode(response.body), TokenDTO.fromJson);
+
+      if (res.isFailed()) {
+        throw APIException(res.error());
+      }
 
       var tokenDTO = res.data;
       var token = TokenMapper()

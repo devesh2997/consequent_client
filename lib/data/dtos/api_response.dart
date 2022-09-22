@@ -1,3 +1,5 @@
+const _codeSuccess = "success";
+
 class APIResponse<T> {
   final String code;
   final String? errorMessage;
@@ -16,5 +18,17 @@ class APIResponse<T> {
       json["errorMessage"],
       data,
     );
+  }
+
+  bool isSuccess() {
+    return code.compareTo(_codeSuccess) == 0;
+  }
+
+  bool isFailed() {
+    return !isSuccess();
+  }
+
+  String error() {
+    return errorMessage ?? "Some error occurred";
   }
 }
