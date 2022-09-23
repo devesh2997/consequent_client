@@ -10,25 +10,55 @@ class MobileInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => TextField(
-        keyboardType: TextInputType.number,
-        onChanged: _controller.setMobile,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 24,
-          letterSpacing: 5,
-        ),
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.zero,
-          icon: const Text(
-            "+91",
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Neumorphic(
+            style: const NeumorphicStyle(
+              boxShape: NeumorphicBoxShape.stadium(),
+              depth: -2,
+            ),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: Row(
+              children: [
+                const Text(
+                  "+91",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    letterSpacing: 2,
+                  ),
+                ),
+                const SizedBox(
+                  width: 6,
+                ),
+                Expanded(
+                  child: TextField(
+                    autofocus: true,
+                    keyboardType: TextInputType.number,
+                    onChanged: _controller.setMobile,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      letterSpacing: 2,
+                    ),
+                    decoration: const InputDecoration.collapsed(hintText: ""),
+                  ),
+                ),
+              ],
             ),
           ),
-          errorText: _controller.invalidMobileError(),
-        ),
+          const SizedBox(
+            height: 6,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              _controller.invalidMobileError(),
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
       ),
     );
   }

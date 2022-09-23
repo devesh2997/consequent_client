@@ -140,7 +140,7 @@ class IdentityServiceImpl implements IdentityService {
       throw ConfirmPasswordMismatchException();
     }
 
-    var token = await repo.signInWithEmail(email, password);
+    var token = await repo.signUpWithEmail(email, password);
     await tokenStore.storeToken(token);
 
     notifyLoggedIn();

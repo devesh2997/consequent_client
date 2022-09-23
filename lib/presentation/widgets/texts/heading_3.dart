@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class Heading1 extends StatelessWidget {
+class Heading3 extends StatelessWidget {
   final String text;
-  const Heading1(this.text, {Key? key}) : super(key: key);
+  const Heading3(this.text, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
       style: const TextStyle(
-        fontSize: 28,
+        fontSize: 18,
         fontWeight: FontWeight.w500,
       ),
     );

@@ -1,21 +1,21 @@
 import 'package:consequent_client/presentation/controllers/identity_controller.dart';
 import 'package:consequent_client/presentation/widgets/appbars/default_app_bar.dart';
-import 'package:consequent_client/presentation/widgets/hocs/with_login/mobile_input.dart';
+import 'package:consequent_client/presentation/widgets/hocs/with_login/email_input.dart';
 import 'package:consequent_client/presentation/widgets/hocs/with_login/submit.dart';
 import 'package:consequent_client/presentation/widgets/texts/heading_1.dart';
 import 'package:consequent_client/presentation/widgets/texts/subtitle.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
 
-class MobileForm extends StatelessWidget {
+class EmailForm extends StatelessWidget {
   final IdentityController _controller = Get.find<IdentityController>();
-  MobileForm({Key? key}) : super(key: key);
+  EmailForm({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: defaultAppBar(),
-      floatingActionButton: LoginFlowSubmit(onPressed: _controller.sendOTP),
+      floatingActionButton: LoginFlowSubmit(onPressed: _controller.submitEmail),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Neumorphic(
@@ -25,22 +25,21 @@ class MobileForm extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Heading1("Enter your mobile number"),
+                const Heading1("Enter your email"),
                 const SizedBox(
                   height: 24,
                 ),
-                const Subtitle("We will send you a confirmation code"),
                 const SizedBox(
                   height: 24,
                 ),
-                MobileInput(),
+                EmailInput(),
                 const SizedBox(
                   height: 8,
                 ),
                 GestureDetector(
                   onTap: _controller.toggleSignInMethod,
                   child: const Subtitle(
-                    "Or Use Your Email.",
+                    "Or Use Your Mobile Number.",
                     decoration: TextDecoration.underline,
                     textColor: Colors.blue,
                   ),

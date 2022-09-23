@@ -108,6 +108,13 @@ class IdentityController extends GetxController {
     }
   }
 
+  void changeEmail() {
+    _resetErrors();
+    _resetInputs();
+    _resetLoaders();
+    _resetStates();
+  }
+
   void changeMobileNumber() {
     _resetErrors();
     _resetOTPInputs();
@@ -200,6 +207,8 @@ class IdentityController extends GetxController {
       _invalidPasswordError.value = e.toString();
     } on ConfirmPasswordMismatchException catch (e) {
       _invalidConfirmPasswordError.value = e.toString();
+    } catch (e) {
+      _invalidPasswordError.value = e.toString();
     }
 
     _isSigningUp.value = false;
@@ -216,6 +225,8 @@ class IdentityController extends GetxController {
       _invalidPasswordError.value = e.toString();
     } on ConfirmPasswordMismatchException catch (e) {
       _invalidConfirmPasswordError.value = e.toString();
+    } catch (e) {
+      _invalidPasswordError.value = e.toString();
     }
 
     _isSigningIn.value = false;
@@ -260,6 +271,18 @@ class IdentityController extends GetxController {
     return _invalidMobileError.value;
   }
 
+  String invalidEmailError() {
+    return _invalidEmailError.value;
+  }
+
+  String invalidPasswordError() {
+    return _invalidPasswordError.value;
+  }
+
+  String invalidConfirmPasswordError() {
+    return _invalidConfirmPasswordError.value;
+  }
+
   String invalidOTPError() {
     return _invalidOTPError.value;
   }
@@ -294,6 +317,10 @@ class IdentityController extends GetxController {
 
   int getEnteredMobileNumber() {
     return _mobileNumber.value;
+  }
+
+  String getEnteredEmail() {
+    return _email.value;
   }
 
   bool isLoggedIn() {

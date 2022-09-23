@@ -1,5 +1,4 @@
 import 'package:consequent_client/presentation/controllers/theme_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
 
@@ -10,14 +9,19 @@ class ToggleTheme extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => IconButton(
+      () => NeumorphicButton(
+        style: const NeumorphicStyle(
+          depth: 2,
+        ),
         onPressed: _controller.toggleDarkTheme,
-        icon: NeumorphicIcon(
-          Icons.lightbulb_rounded,
-          style: NeumorphicStyle(
-            color: _controller.isDarkTheme() ? Colors.white : Colors.yellow,
+        child: Center(
+          child: NeumorphicIcon(
+            Icons.lightbulb_rounded,
+            style: NeumorphicStyle(
+              color: _controller.isDarkTheme() ? Colors.white : Colors.yellow,
+            ),
+            size: 28,
           ),
-          size: 28,
         ),
       ),
     );

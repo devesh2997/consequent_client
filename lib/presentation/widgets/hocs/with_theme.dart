@@ -22,9 +22,9 @@ class WithTheme extends StatelessWidget {
           ),
           darkTheme: const NeumorphicThemeData(
             defaultTextColor: Colors.white,
-            baseColor: Color.fromARGB(255, 58, 56, 56),
+            baseColor: Color.fromARGB(255, 20, 25, 38),
             lightSource: LightSource.top,
-            depth: 3,
+            depth: 1,
           ),
           home: child,
         ));

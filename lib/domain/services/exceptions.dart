@@ -33,7 +33,7 @@ class InvalidEmailException implements Exception {
 class InvalidPasswordException implements Exception {
   @override
   String toString() {
-    return "Invalid password";
+    return "Password must be atleast 6 characters long.";
   }
 }
 
