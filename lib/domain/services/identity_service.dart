@@ -10,7 +10,8 @@ abstract class IdentityService {
   Future<String> sendOTP(int mobileNumber);
   Future<void> verifyOTP(String verificationID, int mobileNumber, int otp);
   Future<bool> isEmailRegistered(String email);
-  Future<void> signUpWithEmail(String email, String password);
+  Future<void> signUpWithEmail(
+      String email, String password, String confirmPassword);
   Future<void> signInWithEmail(String email, String password);
   Future<void> logout();
   void onLoginStateChanged(LoginStateChangeCallback callback);
@@ -127,12 +128,16 @@ class IdentityServiceImpl implements IdentityService {
   }
 
   @override
-  Future<void> signUpWithEmail(String email, String password) async {
+  Future<void> signUpWithEmail(
+      String email, String password, String confirmPassword) async {
     if (!_isEmailValid(email)) {
       throw InvalidEmailException();
     }
     if (!_isPasswordValid(password)) {
       throw InvalidPasswordException();
+    }
+    if (confirmPassword.compareTo(password) != 0) {
+      throw ConfirmPasswordMismatchException();
     }
 
     var token = await repo.signInWithEmail(email, password);

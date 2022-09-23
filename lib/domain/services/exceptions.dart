@@ -36,3 +36,10 @@ class InvalidPasswordException implements Exception {
     return "Invalid password";
   }
 }
+
+class ConfirmPasswordMismatchException implements Exception {
+  @override
+  String toString() {
+    return "Password and Confirm Password mismatch";
+  }
+}

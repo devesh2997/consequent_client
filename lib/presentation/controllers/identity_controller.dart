@@ -19,22 +19,40 @@ class SampleStrategy extends OTPStrategy {
 class IdentityController extends GetxController {
   final IdentityService identityService = injectIdentityService();
 
+  // loading states
   final Rx<bool> _isLoggedIn = false.obs;
   final Rx<bool> _isSendingOTP = false.obs;
-  final Rx<bool> _otpSent = false.obs;
   final Rx<bool> _isVerifyingOTP = false.obs;
+  final Rx<bool> _isSubmittingEmail = false.obs;
+  final Rx<bool> _isSigningUp = false.obs;
+  final Rx<bool> _isSigningIn = false.obs;
 
+  // process states
+  final Rx<bool> _signInWithMobileSelected = true.obs;
+  final Rx<bool> _otpSent = true.obs;
+  final Rx<bool> _emailSubmitted = false.obs;
+  final Rx<bool> _isEmailRegistered = false.obs;
+
+  // input states
+  final Rx<String> _email = "".obs;
+  final Rx<String> _password = "".obs;
+  final Rx<String> _confirmPassword = "".obs;
   final Rx<int> _mobileNumber = 0.obs;
   int _otp = 0;
   String _verificationID = "";
 
+  // error states
   final Rx<String> _error = "".obs;
-
   final Rx<String> _invalidMobileError = "".obs;
   final Rx<String> _invalidOTPError = "".obs;
+  final Rx<String> _invalidEmailError = "".obs;
+  final Rx<String> _invalidPasswordError = "".obs;
+  final Rx<String> _invalidConfirmPasswordError = "".obs;
 
+  // input controllers
   late OTPTextEditController controller;
 
+  // callbacks
   OTPChangeCallback? _otpChangeCallback;
 
   @override
@@ -49,9 +67,13 @@ class IdentityController extends GetxController {
           _reset();
         }
       });
-      _startListeningForOTP();
+      // _startListeningForOTP();
     } catch (e) {}
     super.onInit();
+  }
+
+  void toggleSignInMethod() {
+    _signInWithMobileSelected.value = !_signInWithMobileSelected.value;
   }
 
   void onOTPChanged(OTPChangeCallback callback) {
@@ -61,6 +83,21 @@ class IdentityController extends GetxController {
   void setMobile(String mobileNumber) {
     _resetErrors();
     _mobileNumber.value = int.tryParse(mobileNumber) ?? 0;
+  }
+
+  void setEmail(String email) {
+    _resetErrors();
+    _email.value = email;
+  }
+
+  void setPassword(String password) {
+    _resetErrors();
+    _password.value = password;
+  }
+
+  void setConfirmPassword(String confirmPassword) {
+    _resetErrors();
+    _confirmPassword.value = confirmPassword;
   }
 
   void setOTP(String otp) {
@@ -89,16 +126,25 @@ class IdentityController extends GetxController {
     _invalidMobileError.value = "";
     _error.value = "";
     _invalidOTPError.value = "";
+    _invalidEmailError.value = "";
+    _invalidPasswordError.value = "";
+    _invalidConfirmPasswordError.value = "";
   }
 
   void _resetLoaders() {
     _isSendingOTP.value = false;
     _isVerifyingOTP.value = false;
+    _isSubmittingEmail.value = false;
+    _isSigningIn.value = false;
+    _isSigningUp.value = false;
   }
 
   void _resetInputs() {
     _resetOTPInputs();
     _mobileNumber.value = 0;
+    _email.value = "";
+    _password.value = "";
+    _confirmPassword.value = "";
   }
 
   void _resetOTPInputs() {
@@ -108,6 +154,7 @@ class IdentityController extends GetxController {
 
   void _resetStates() {
     _otpSent.value = false;
+    _emailSubmitted.value = false;
   }
 
   void _startListeningForOTP() {
@@ -125,6 +172,53 @@ class IdentityController extends GetxController {
           // SampleStrategy(),
         ],
       );
+  }
+
+  void submitEmail() async {
+    _isSubmittingEmail.value = true;
+    try {
+      var registered = await identityService.isEmailRegistered(_email.value);
+      _isEmailRegistered.value = registered;
+      _emailSubmitted.value = true;
+    } on InvalidEmailException catch (e) {
+      _invalidEmailError.value = e.toString();
+    } catch (e) {
+      _invalidEmailError.value = e.toString();
+    }
+    _isSubmittingEmail.value = false;
+  }
+
+  void signUPWithEmail() async {
+    _isSigningUp.value = true;
+
+    try {
+      await identityService.signUpWithEmail(
+          _email.value, _password.value, _confirmPassword.value);
+    } on InvalidEmailException catch (e) {
+      _invalidEmailError.value = e.toString();
+    } on InvalidPasswordException catch (e) {
+      _invalidPasswordError.value = e.toString();
+    } on ConfirmPasswordMismatchException catch (e) {
+      _invalidConfirmPasswordError.value = e.toString();
+    }
+
+    _isSigningUp.value = false;
+  }
+
+  void signInWithEmail() async {
+    _isSigningIn.value = true;
+
+    try {
+      await identityService.signInWithEmail(_email.value, _password.value);
+    } on InvalidEmailException catch (e) {
+      _invalidEmailError.value = e.toString();
+    } on InvalidPasswordException catch (e) {
+      _invalidPasswordError.value = e.toString();
+    } on ConfirmPasswordMismatchException catch (e) {
+      _invalidConfirmPasswordError.value = e.toString();
+    }
+
+    _isSigningIn.value = false;
   }
 
   void sendOTP() async {
@@ -178,8 +272,24 @@ class IdentityController extends GetxController {
     return _isVerifyingOTP.value;
   }
 
+  bool isSubmittingEmail() {
+    return _isSubmittingEmail.value;
+  }
+
+  bool isSigningUp() {
+    return _isSigningUp.value;
+  }
+
+  bool isSigningIn() {
+    return _isSigningIn.value;
+  }
+
   bool isLoading() {
-    return isSendingOTP() || isVerifyingOTP();
+    return isSendingOTP() ||
+        isVerifyingOTP() ||
+        isSubmittingEmail() ||
+        isSigningIn() ||
+        isSigningUp();
   }
 
   int getEnteredMobileNumber() {
@@ -188,6 +298,18 @@ class IdentityController extends GetxController {
 
   bool isLoggedIn() {
     return _isLoggedIn.value;
+  }
+
+  bool isEmailSubmitted() {
+    return _emailSubmitted.value;
+  }
+
+  bool isEmailRegistered() {
+    return _isEmailRegistered.value;
+  }
+
+  bool isSignInWithMobileSelected() {
+    return _signInWithMobileSelected.value;
   }
 
   void logout() {

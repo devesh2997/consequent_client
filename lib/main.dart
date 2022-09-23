@@ -2,7 +2,7 @@ import 'package:consequent_client/presentation/controllers/identity_controller.d
 import 'package:consequent_client/presentation/controllers/theme_controller.dart';
 import 'package:consequent_client/presentation/pages/home.dart';
 import 'package:consequent_client/presentation/pages/splash.dart';
-import 'package:consequent_client/presentation/widgets/hocs/with_login.dart';
+import 'package:consequent_client/presentation/widgets/hocs/with_login/with_login.dart';
 import 'package:consequent_client/presentation/widgets/hocs/with_theme.dart';
 import 'package:flutter/material.dart';
 
