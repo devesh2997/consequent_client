@@ -9,6 +9,8 @@ abstract class IdentityService {
   Future<bool> isLoggedIn();
   Future<String> sendOTP(int mobileNumber);
   Future<void> verifyOTP(String verificationID, int mobileNumber, int otp);
+  Future<bool> isEmailRegistered(String email);
+  Future<void> signUpWithEmail(String email, String password);
   Future<void> signInWithEmail(String email, String password);
   Future<void> logout();
   void onLoginStateChanged(LoginStateChangeCallback callback);
@@ -54,6 +56,9 @@ class IdentityServiceImpl implements IdentityService {
     if (!_isEmailValid(email)) {
       throw InvalidEmailException();
     }
+    if (!_isPasswordValid(password)) {
+      throw InvalidPasswordException();
+    }
 
     var token = await repo.signInWithEmail(email, password);
     await tokenStore.storeToken(token);
@@ -83,6 +88,10 @@ class IdentityServiceImpl implements IdentityService {
         .hasMatch(email);
   }
 
+  bool _isPasswordValid(String password) {
+    return password.length > 5;
+  }
+
   @override
   Future<void> logout() async {
     await tokenStore.deleteToken();
@@ -105,5 +114,30 @@ class IdentityServiceImpl implements IdentityService {
     for (var callback in _callbacks) {
       callback(false);
     }
+  }
+
+  @override
+  Future<bool> isEmailRegistered(String email) async {
+    if (!_isEmailValid(email)) {
+      throw InvalidEmailException();
+    }
+    var registered = await repo.isEmailRegistered(email);
+
+    return registered;
+  }
+
+  @override
+  Future<void> signUpWithEmail(String email, String password) async {
+    if (!_isEmailValid(email)) {
+      throw InvalidEmailException();
+    }
+    if (!_isPasswordValid(password)) {
+      throw InvalidPasswordException();
+    }
+
+    var token = await repo.signInWithEmail(email, password);
+    await tokenStore.storeToken(token);
+
+    notifyLoggedIn();
   }
 }

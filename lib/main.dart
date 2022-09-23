@@ -21,34 +21,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Consequent',
-      theme: ThemeData(
-        primaryColor: Colors.indigoAccent,
-        brightness: Brightness.light,
-        backgroundColor: Colors.white,
-        dividerColor: Colors.white54,
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
-            .copyWith(
-                secondary: Colors.indigo.shade600,
-                brightness: Brightness.light),
-        highlightColor: Colors.blue,
-      ),
-      darkTheme: ThemeData(
-        primaryColor: Colors.indigo.shade900,
-        brightness: Brightness.dark,
-        backgroundColor: const Color(0xFF212121),
-        dividerColor: Colors.black12,
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
-            .copyWith(
-                secondary: Colors.indigo.shade400, brightness: Brightness.dark),
-        highlightColor: Colors.pink,
-      ),
-      themeMode: ThemeMode.dark,
-      home: WithTheme(WithLogin(
-        const Home(),
-      )),
-    );
+    return WithTheme(WithLogin(
+      const Home(),
+    ));
   }
 }

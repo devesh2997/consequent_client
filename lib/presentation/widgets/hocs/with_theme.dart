@@ -1,5 +1,6 @@
 import 'package:consequent_client/presentation/controllers/theme_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
 
 class WithTheme extends StatelessWidget {
@@ -9,40 +10,23 @@ class WithTheme extends StatelessWidget {
 
   @override
   build(BuildContext context) {
-    return Obx(
-      () => _controller.isDarkTheme()
-          ? Theme(
-              data: ThemeData(
-                primaryColor: Colors.indigo.shade900,
-                brightness: Brightness.dark,
-                backgroundColor: const Color(0xFF212121),
-                dividerColor: Colors.black12,
-                colorScheme:
-                    ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
-                        .copyWith(
-                  secondary: Colors.indigo.shade400,
-                  brightness: Brightness.dark,
-                  surface: Colors.indigo.shade900,
-                ),
-                highlightColor: Colors.pink,
-              ),
-              child: child,
-            )
-          : Theme(
-              data: ThemeData(
-                primaryColor: Colors.indigoAccent,
-                brightness: Brightness.light,
-                backgroundColor: Colors.white,
-                dividerColor: Colors.white54,
-                colorScheme:
-                    ColorScheme.fromSwatch(primarySwatch: Colors.indigo)
-                        .copyWith(
-                            secondary: Colors.indigo.shade600,
-                            brightness: Brightness.light),
-                highlightColor: Colors.blue,
-              ),
-              child: child,
-            ),
-    );
+    return Obx(() => NeumorphicApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Neumorphic App',
+          themeMode:
+              _controller.isDarkTheme() ? ThemeMode.dark : ThemeMode.light,
+          theme: const NeumorphicThemeData(
+            baseColor: Color.fromARGB(255, 235, 235, 235),
+            lightSource: LightSource.top,
+            depth: 3,
+          ),
+          darkTheme: const NeumorphicThemeData(
+            defaultTextColor: Colors.white,
+            baseColor: Color.fromARGB(255, 58, 56, 56),
+            lightSource: LightSource.top,
+            depth: 3,
+          ),
+          home: child,
+        ));
   }
 }

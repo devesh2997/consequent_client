@@ -3,6 +3,7 @@ import 'package:consequent_client/presentation/widgets/appbars/default_app_bar.d
 import 'package:consequent_client/presentation/widgets/texts/heading_1.dart';
 import 'package:consequent_client/presentation/widgets/texts/subtitle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
 import 'package:otp_autofill/otp_autofill.dart';
 import 'package:otp_text_field/otp_field.dart';
@@ -53,38 +54,45 @@ class _LoginWithMobileState extends State<LoginWithMobile> {
   }
 
   Scaffold getMobileForm(BuildContext context) {
+    var theme = NeumorphicTheme.of(context);
+
     return Scaffold(
       appBar: defaultAppBar(),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _controller.sendOTP,
-        label: const Text(
-          "Next",
-        ),
-        icon: _controller.isLoading()
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(),
-              )
-            : const Icon(
-                Icons.arrow_forward_sharp,
-              ),
-      ),
+      floatingActionButton: NeumorphicFloatingActionButton(
+          onPressed: _controller.sendOTP,
+          child: _controller.isLoading()
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(),
+                )
+              : Icon(
+                  Icons.arrow_forward_sharp,
+                  size: 24,
+                  color:
+                      theme?.isUsingDark ?? false ? Colors.white : Colors.black,
+                )),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(28, 28, 28, 50),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Heading1("Enter your mobile number"),
-            const SizedBox(
-              height: 24,
+        padding: const EdgeInsets.all(16),
+        child: Neumorphic(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Heading1("Enter your mobile number"),
+                const SizedBox(
+                  height: 24,
+                ),
+                const Subtitle("We will send you a confirmation code"),
+                const SizedBox(
+                  height: 24,
+                ),
+                getMobileInput(),
+              ],
             ),
-            const Subtitle("We will send you a confirmation code"),
-            const SizedBox(
-              height: 24,
-            ),
-            getMobileInput(),
-          ],
+          ),
         ),
       ),
     );
@@ -176,27 +184,25 @@ class _LoginWithMobileState extends State<LoginWithMobile> {
     );
   }
 
-  Expanded getMobileInput() {
-    return Expanded(
-      child: TextField(
-        keyboardType: TextInputType.number,
-        onChanged: _controller.setMobile,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 24,
-          letterSpacing: 5,
-        ),
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.zero,
-          icon: const Text(
-            "+91",
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 24,
-            ),
+  Widget getMobileInput() {
+    return TextField(
+      keyboardType: TextInputType.number,
+      onChanged: _controller.setMobile,
+      style: const TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 24,
+        letterSpacing: 5,
+      ),
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.zero,
+        icon: const Text(
+          "+91",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
           ),
-          errorText: _controller.invalidMobileError(),
         ),
+        errorText: _controller.invalidMobileError(),
       ),
     );
   }
