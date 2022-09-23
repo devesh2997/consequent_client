@@ -29,7 +29,7 @@ class IdentityController extends GetxController {
 
   // process states
   final Rx<bool> _signInWithMobileSelected = true.obs;
-  final Rx<bool> _otpSent = true.obs;
+  final Rx<bool> _otpSent = false.obs;
   final Rx<bool> _emailSubmitted = false.obs;
   final Rx<bool> _isEmailRegistered = false.obs;
 
@@ -67,7 +67,6 @@ class IdentityController extends GetxController {
           _reset();
         }
       });
-      // _startListeningForOTP();
     } catch (e) {}
     super.onInit();
   }
@@ -239,6 +238,7 @@ class IdentityController extends GetxController {
       var verificationID = await identityService.sendOTP(_mobileNumber.value);
       _verificationID = verificationID;
       _otpSent.value = true;
+      _startListeningForOTP();
     } on InvalidMobileException catch (e) {
       _invalidMobileError.value = e.toString();
     } catch (e) {

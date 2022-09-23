@@ -12,7 +12,7 @@ import 'package:consequent_client/domain/services/exceptions.dart';
 import 'package:http/http.dart' as http;
 
 class IdentityAPIConstants {
-  static String baseURL = "quiet-icons-check-122-161-86-31.loca.lt";
+  static String baseURL = "198.211.115.203:5035";
 
   static String sendOTPEndpoint = "identity/v1/send-otp";
   static String verifyOTPEndpoint = "identity/v1/verify-otp";
@@ -25,7 +25,7 @@ class IdentityRepoImpl implements IdentityRepo {
   @override
   Future<String> sendOTP(int mobileNumber) async {
     try {
-      var url = Uri.https(
+      var url = Uri.http(
           IdentityAPIConstants.baseURL,
           IdentityAPIConstants.sendOTPEndpoint,
           {"mobile_number": mobileNumber.toString()});
@@ -52,7 +52,7 @@ class IdentityRepoImpl implements IdentityRepo {
   @override
   Future<Token> signInWithEmail(String email, String password) async {
     try {
-      var url = Uri.https(
+      var url = Uri.http(
         IdentityAPIConstants.baseURL,
         IdentityAPIConstants.signInWithEmailEndpoint,
       );
@@ -86,7 +86,7 @@ class IdentityRepoImpl implements IdentityRepo {
   @override
   Future<bool> isEmailRegistered(String email) async {
     try {
-      var url = Uri.https(
+      var url = Uri.http(
         IdentityAPIConstants.baseURL,
         IdentityAPIConstants.isEmailRegisteredEndpoint,
         {
@@ -116,7 +116,7 @@ class IdentityRepoImpl implements IdentityRepo {
   @override
   Future<Token> signUpWithEmail(String email, String password) async {
     try {
-      var url = Uri.https(
+      var url = Uri.http(
         IdentityAPIConstants.baseURL,
         IdentityAPIConstants.signUpWithEmailEndpoint,
       );
@@ -151,7 +151,7 @@ class IdentityRepoImpl implements IdentityRepo {
   Future<Token> verifyOTP(
       String verificationID, int mobileNumber, int otp) async {
     try {
-      var url = Uri.https(
+      var url = Uri.http(
         IdentityAPIConstants.baseURL,
         IdentityAPIConstants.verifyOTPEndpoint,
       );

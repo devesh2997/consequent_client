@@ -31,25 +31,29 @@ class OTPInput extends StatelessWidget {
           const SizedBox(
             height: 24,
           ),
-          OTPTextField(
-            controller: _otpController,
-            otpFieldStyle: OtpFieldStyle(
-              borderColor: Theme.of(context).highlightColor,
-              focusBorderColor: Theme.of(context).highlightColor,
-              disabledBorderColor: Theme.of(context).highlightColor,
-              enabledBorderColor: Theme.of(context).highlightColor,
-              errorBorderColor: Colors.red,
-            ),
-            hasError: _controller.invalidOTPError().isNotEmpty,
-            width: MediaQuery.of(context).size.width,
-            length: 4,
-            onChanged: _controller.setOTP,
-            fieldStyle: FieldStyle.box,
-            fieldWidth: 40,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 24,
-              letterSpacing: 5,
+          Neumorphic(
+            style: const NeumorphicStyle(),
+            padding: const EdgeInsets.all(16),
+            child: OTPTextField(
+              controller: _otpController,
+              otpFieldStyle: OtpFieldStyle(
+                borderColor: Theme.of(context).highlightColor,
+                focusBorderColor: Theme.of(context).highlightColor,
+                disabledBorderColor: Theme.of(context).highlightColor,
+                enabledBorderColor: Theme.of(context).highlightColor,
+                errorBorderColor: Colors.red,
+              ),
+              hasError: _controller.invalidOTPError().isNotEmpty,
+              width: MediaQuery.of(context).size.width,
+              length: 4,
+              onChanged: _controller.setOTP,
+              fieldStyle: FieldStyle.box,
+              fieldWidth: 40,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 24,
+                letterSpacing: 5,
+              ),
             ),
           ),
           const SizedBox(
