@@ -12,9 +12,11 @@ import 'package:consequent_client/domain/services/exceptions.dart';
 import 'package:http/http.dart' as http;
 
 class IdentityAPIConstants {
-  static String baseURL = "198.211.115.203:5035";
+  // static String baseURL = "159.65.159.157:5035";
+  static String baseURL = "ripe-seas-start-223-190-89-233.loca.lt";
 
   static String sendOTPEndpoint = "identity/v1/send-otp";
+  static String resendOTPEndpoint = "identity/v1/resend-otp";
   static String verifyOTPEndpoint = "identity/v1/verify-otp";
   static String signInWithEmailEndpoint = "identity/v1/sign-in-with-email";
   static String signUpWithEmailEndpoint = "identity/v1/sign-up-with-email";
@@ -29,6 +31,33 @@ class IdentityRepoImpl implements IdentityRepo {
           IdentityAPIConstants.baseURL,
           IdentityAPIConstants.sendOTPEndpoint,
           {"mobile_number": mobileNumber.toString()});
+      var response = await http.post(url, body: {});
+
+      if (response.statusCode != 200) {
+        throw APIException(response.reasonPhrase);
+      }
+
+      APIResponse<VerificationID> res = APIResponse.fromJson(
+          jsonDecode(response.body), VerificationID.fromJson);
+
+      if (res.isSuccess()) {
+        return res.data?.verificationID ?? "";
+      }
+
+      throw APIException(res.error());
+    } catch (e) {
+      log(e.toString()); // TODO (devesh2997) | handle exception
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> resendOTP(String vefificationID) async {
+    try {
+      var url = Uri.http(
+          IdentityAPIConstants.baseURL,
+          IdentityAPIConstants.resendOTPEndpoint,
+          {"verification_id": vefificationID});
       var response = await http.post(url, body: {});
 
       if (response.statusCode != 200) {

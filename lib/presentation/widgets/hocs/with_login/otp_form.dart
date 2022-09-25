@@ -45,7 +45,7 @@ class OTPForm extends StatelessWidget {
                     "We have sent an OTP to ${_controller.getEnteredMobileNumber()}.",
                   ),
                   const SizedBox(
-                    height: 6,
+                    height: 16,
                   ),
                   GestureDetector(
                     onTap: _controller.changeMobileNumber,
@@ -55,11 +55,35 @@ class OTPForm extends StatelessWidget {
                       textColor: Colors.blue,
                     ),
                   ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  resendOTP(),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  GestureDetector resendOTP() {
+    var textColor = Colors.blue;
+    var text = "Didn't receive OTP ? Resend";
+    if (_controller.canResendOTP()) {
+      text += ".";
+    } else {
+      textColor = Colors.grey;
+      text += " in ${_controller.getResendOTPTimeout()} seconds.";
+    }
+
+    return GestureDetector(
+      onTap: _controller.resendOTP,
+      child: Subtitle(
+        text,
+        decoration: TextDecoration.underline,
+        textColor: textColor,
       ),
     );
   }

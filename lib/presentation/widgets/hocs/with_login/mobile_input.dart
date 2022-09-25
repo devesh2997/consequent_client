@@ -1,11 +1,42 @@
+import 'dart:developer';
+
 import 'package:consequent_client/presentation/controllers/identity_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
 
-class MobileInput extends StatelessWidget {
-  final IdentityController _controller = Get.find<IdentityController>();
+class MobileInput extends StatefulWidget {
   MobileInput({Key? key}) : super(key: key);
+
+  @override
+  State<MobileInput> createState() => _MobileInputState();
+}
+
+class _MobileInputState extends State<MobileInput> {
+  final IdentityController _controller = Get.find<IdentityController>();
+  final _mobileInputController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // _controller.onMobileChange((mobile) {
+    //   _mobileInputController.text = mobile;
+    // });
+
+    // Start listening to changes.
+    _mobileInputController.addListener(
+      () {
+        // _controller.setMobile(_mobileInputController.text);
+        log(_mobileInputController.text);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _mobileInputController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +65,9 @@ class MobileInput extends StatelessWidget {
                 ),
                 Expanded(
                   child: TextField(
+                    controller: _controller.getMobileController(),
                     autofocus: true,
                     keyboardType: TextInputType.number,
-                    onChanged: _controller.setMobile,
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 18,

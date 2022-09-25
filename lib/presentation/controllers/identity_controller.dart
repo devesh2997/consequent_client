@@ -1,10 +1,13 @@
 import 'package:consequent_client/containers/identity_container.dart';
 import 'package:consequent_client/domain/services/exceptions.dart';
 import 'package:consequent_client/domain/services/identity_service.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:otp_autofill/otp_autofill.dart';
+import 'dart:async';
 
 typedef OTPChangeCallback = void Function(int otp);
+typedef MobileChangeCallback = void Function(String mobile);
 
 class SampleStrategy extends OTPStrategy {
   @override
@@ -32,6 +35,7 @@ class IdentityController extends GetxController {
   final Rx<bool> _otpSent = false.obs;
   final Rx<bool> _emailSubmitted = false.obs;
   final Rx<bool> _isEmailRegistered = false.obs;
+  final Rx<int> _resendOTPTimeout = 10.obs;
 
   // input states
   final Rx<String> _email = "".obs;
@@ -51,6 +55,7 @@ class IdentityController extends GetxController {
 
   // input controllers
   late OTPTextEditController controller;
+  final _mobileInputController = TextEditingController();
 
   // callbacks
   OTPChangeCallback? _otpChangeCallback;
@@ -67,8 +72,30 @@ class IdentityController extends GetxController {
           _reset();
         }
       });
+
+      _mobileInputController.addListener(() {
+        _setMobile(_mobileInputController.text);
+      });
     } catch (e) {}
     super.onInit();
+  }
+
+  _resetResendOTPTimeout() {
+    _resendOTPTimeout.value = 15;
+    _beginResendOTPTimer();
+  }
+
+  _beginResendOTPTimer() {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      _resendOTPTimeout.value = _resendOTPTimeout.value - 1;
+      if (_resendOTPTimeout.value == 0) {
+        timer.cancel();
+      }
+    });
+  }
+
+  TextEditingController getMobileController() {
+    return _mobileInputController;
   }
 
   void toggleSignInMethod() {
@@ -79,9 +106,21 @@ class IdentityController extends GetxController {
     _otpChangeCallback = callback;
   }
 
-  void setMobile(String mobileNumber) {
+  void _setMobile(String mobileNumber) {
     _resetErrors();
-    _mobileNumber.value = int.tryParse(mobileNumber) ?? 0;
+    if (mobileNumber.length > 10) {
+      mobileNumber = mobileNumber.substring(0, 10);
+    }
+    var mobile = int.tryParse(mobileNumber) ?? 0;
+    mobileNumber = mobile == 0 ? "" : mobile.toString();
+
+    _mobileInputController.value = TextEditingValue(
+      text: mobileNumber,
+      selection: TextSelection.fromPosition(
+        TextPosition(offset: mobileNumber.length),
+      ),
+    );
+    _mobileNumber.value = mobile;
   }
 
   void setEmail(String email) {
@@ -238,6 +277,28 @@ class IdentityController extends GetxController {
       var verificationID = await identityService.sendOTP(_mobileNumber.value);
       _verificationID = verificationID;
       _otpSent.value = true;
+      _resetResendOTPTimeout();
+      _startListeningForOTP();
+    } on InvalidMobileException catch (e) {
+      _invalidMobileError.value = e.toString();
+    } catch (e) {
+      _invalidMobileError.value = e.toString();
+    }
+
+    _isSendingOTP.value = false;
+  }
+
+  void resendOTP() async {
+    if (!canResendOTP()) {
+      return;
+    }
+    _isSendingOTP.value = true;
+    _resetErrors();
+    try {
+      var verificationID = await identityService.resendOTP(_verificationID);
+      _verificationID = verificationID;
+      _otpSent.value = true;
+      _resetResendOTPTimeout();
       _startListeningForOTP();
     } on InvalidMobileException catch (e) {
       _invalidMobileError.value = e.toString();
@@ -337,6 +398,14 @@ class IdentityController extends GetxController {
 
   bool isSignInWithMobileSelected() {
     return _signInWithMobileSelected.value;
+  }
+
+  int getResendOTPTimeout() {
+    return _resendOTPTimeout.value;
+  }
+
+  bool canResendOTP() {
+    return getResendOTPTimeout() == 0;
   }
 
   void logout() {

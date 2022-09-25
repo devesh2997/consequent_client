@@ -8,6 +8,7 @@ typedef LoginStateChangeCallback = void Function(bool isLoggedIn);
 abstract class IdentityService {
   Future<bool> isLoggedIn();
   Future<String> sendOTP(int mobileNumber);
+  Future<String> resendOTP(String verificationID);
   Future<void> verifyOTP(String verificationID, int mobileNumber, int otp);
   Future<bool> isEmailRegistered(String email);
   Future<void> signUpWithEmail(
@@ -47,9 +48,13 @@ class IdentityServiceImpl implements IdentityService {
     return repo.sendOTP(mobileNumber);
   }
 
+  @override
+  Future<String> resendOTP(String verificationID) {
+    return repo.resendOTP(verificationID);
+  }
+
   bool _isMobileNumberValid(int mobileNumber) {
-    return mobileNumber.toString().length ==
-        10; // TODO (devesh2997) | improve this validation. (can use regex)
+    return RegExp(r'^[6-9]\d{9}$').hasMatch(mobileNumber.toString());
   }
 
   @override
